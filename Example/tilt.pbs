@@ -1,0 +1,96 @@
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=16:mem=128gb
+
+cd $PBS_O_WORKDIR
+
+module load intel-suite
+
+#script takes a given tilt, runs a propogation, gets adiabatic populations, width and position expectation values of the diabatic and adi
+
+experiment_name=tilt_angles2
+#Create directory to store the data, transfer some required files
+#mkdir $experiment_name
+#cp tilt_input.inp $experiment_name/tilt_input.inp
+#cp dirname_changer.py $experiment_name/dirname_changer.py
+#cp ci-operator.op $experiment_name/ci-operator.op
+
+cd $experiment_name
+
+
+
+alpha=0.7853981633974483
+momentum=99.61083202869969
+
+
+
+dirname=alpha-a0.25pi
+#mkdir $dirname
+#change the named directory in the input file
+python dirname_changer.py $dirname
+
+# run calculation, creating the named directory
+quantics.omp -w -p alpha $alpha -p x_moment $momentum tilt_input.inp
+ 
+#navigate to experiment folder an create expectations folder
+cp ../wf-processing.pbs $dirname/wf-processing.pbs
+cd $dirname
+mkdir expectations_dir
+ 
+#calcualtes adiabatic populations
+adpop -w -noq -o adp-a$alpha
+
+#retruns total energy and records it in energies.txt
+rdcheck etot
+ 
+# Calculates adiabatic wavefunction
+di2ad -w -o ./psi.ad
+
+# gets the required adiabatic expectation values
+# For <x> and <y>
+expect -w -o ./expectations_dir/xadbstate1-a$alpha -f psi.ad xstate1
+expect -w -o ./expectations_dir/xadbstate2-a$alpha -f psi.ad xstate2
+expect -w -o ./expectations_dir/yadbstate1-a$alpha -f psi.ad ystate1
+expect -w -o ./expectations_dir/yadbstate2-a$alpha -f psi.ad ystate2
+# For <x^2> and <y^2>
+expect -w -o ./expectations_dir/x2adbstate1-a$alpha -f psi.ad x2state1
+expect -w -o ./expectations_dir/x2adbstate2-a$alpha -f psi.ad x2state2
+expect -w -o ./expectations_dir/y2adbstate1-a$alpha -f psi.ad y2state1
+expect -w -o ./expectations_dir/y2adbstate2-a$alpha -f psi.ad y2state2
+# For <p_x> and <p_y>
+expect -w -o ./expectations_dir/p_xadbstate1-a$alpha -f psi.ad xmomentumstate1
+expect -w -o ./expectations_dir/p_xadbstate2-a$alpha -f psi.ad xmomentumstate2
+expect -w -o ./expectations_dir/p_yadbstate1-a$alpha -f psi.ad ymomentumstate1
+expect -w -o ./expectations_dir/p_yadbstate2-a$alpha -f psi.ad ymomentumstate2
+# For <KE_x> and <KE_y>
+expect -w -o ./expectations_dir/KE_xadbstate1-a$alpha -f psi.ad xKEstate1
+expect -w -o ./expectations_dir/KE_xadbstate2-a$alpha -f psi.ad xKEstate2
+expect -w -o ./expectations_dir/KE_yadbstate1-a$alpha -f psi.ad yKEstate1
+expect -w -o ./expectations_dir/KE_yadbstate2-a$alpha -f psi.ad yKEstate2
+
+# gets diabatic expectation values, for good measure
+# For <x> and <y>
+expect -w -o ./expectations_dir/xdiabstate1-a$alpha xstate1
+expect -w -o ./expectations_dir/xdiabstate2-a$alpha xstate2
+expect -w -o ./expectations_dir/ydiabstate1-a$alpha ystate1
+expect -w -o ./expectations_dir/ydiabstate2-a$alpha ystate2
+# For <x^2> and <y^2>
+expect -w -o ./expectations_dir/x2diabstate1-a$alpha x2state1
+expect -w -o ./expectations_dir/x2diabstate2-a$alpha x2state2
+expect -w -o ./expectations_dir/y2diabstate1-a$alpha y2state1
+expect -w -o ./expectations_dir/y2diabstate2-a$alpha y2state2
+# For <p_x> and <p_y>
+expect -w -o ./expectations_dir/p_xdiabstate1-a$alpha xmomentumstate1
+expect -w -o ./expectations_dir/p_xdiabstate2-a$alpha xmomentumstate2
+expect -w -o ./expectations_dir/p_ydiabstate1-a$alpha ymomentumstate1
+expect -w -o ./expectations_dir/p_ydiabstate2-a$alpha ymomentumstate2
+# For <KE_x> and <KE_y>
+expect -w -o ./expectations_dir/KE_xdiabstate1-a$alpha xKEstate1
+expect -w -o ./expectations_dir/KE_xdiabstate2-a$alpha xKEstate2
+expect -w -o ./expectations_dir/KE_ydiabstate1-a$alpha yKEstate1
+expect -w -o ./expectations_dir/KE_ydiabstate2-a$alpha yKEstate2
+
+#sends all relevant data files to onedrive
+rclone copy adp-a$alpha imp:$ONEDRIVE_DIR/$experiment_name/$dirname
+rclone copy etot.pl imp:$ONEDRIVE_DIR/$experiment_name/$dirname
+rclone copy ./expectations_dir/ imp:$ONEDRIVE_DIR/$experiment_name/$dirname/expectations_dir
+

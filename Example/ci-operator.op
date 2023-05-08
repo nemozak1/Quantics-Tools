@@ -1,0 +1,169 @@
+OP_DEFINE-SECTION
+title
+CI PES
+end-title
+end-op_define-section
+
+#15000 is 8.23g mol-1 
+#F converted into au by factor of 0.0194469
+#Ax = F*tan(alpha_x)
+#Ay = F*tan(alpha_y)
+#Bx = F**2
+#By = e*F**2
+
+PARAMETER-SECTION
+F = 0.04
+alpha_x = 0.0
+alpha_y = 0.0
+tilt_x = TAN[alpha_x]
+tilt_y = TAN[alpha_y]
+e = 1
+mass_x = 15000
+mass_y = 15000
+end-parameter-section
+
+HAMILTONIAN-SECTION
+-------------------------------
+modes | x  | y  | el
+-------------------------------
+1.          | KE | 1  | 1
+1.          | 1  | KE | 1
+F*tilt_x    | q  | 1  | 1
+F*tilt_y    | 1  | q  | 1
+F           | q  | 1  | S1&1
+-1*F        | q  | 1  | S2&2
+e^0.5*F     | 1  | q  | S1&2
+-------------------------------
+end-hamiltonian-section
+
+#What follows are custom operators to get <p>, <x> and <x^2> <KE>
+HAMILTONIAN-SECTION_xKEstate1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | KE | 1 | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_xKEstate2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | KE | 1 | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_yKEstate1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | KE | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_yKEstate2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | KE | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_xmomentumstate1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | p | 1 | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_xmomentumstate2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | p | 1 | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_ymomentumstate1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | p | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_ymomentumstate2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | p | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_xstate1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | q | 1 | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_xstate2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | q | 1 | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_ystate1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | q | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_ystate2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | q | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_x2state1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | q^2 | 1 | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_x2state2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | q^2 | 1 | S2&2
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_y2state1
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | q^2 | S1&1
+-------------------------------
+end-hamiltonian-section
+
+HAMILTONIAN-SECTION_y2state2
+-------------------------------
+modes | x | y | el
+-------------------------------
+1  | 1 | q^2 | S2&2
+-------------------------------
+end-hamiltonian-section
+
+
+end-operator

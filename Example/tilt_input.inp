@@ -1,0 +1,50 @@
+#######################################################################         
+###           Test of NOCl1 / FFT basis-section                     ###
+#######################################################################         
+
+PARAMETER-SECTION
+alpha=0.0
+x_moment=60.0
+end-parameter-section
+
+RUN-SECTION
+name = momentum_p40.0  propagation exact
+tfinal = 60.0   tout = 0.3  tpsi=1.5
+psi=double  all
+end-run-section
+
+pbasis-section
+#Label    DVR      N         Parameter
+    x     fft      6561    -20.0  25.0
+    y     fft      3456    -20.0  20.0
+    el    el       2
+end-pbasis-section 
+
+OPERATOR-SECTION
+opname = ci-operator
+
+alter-parameters
+alpha_x=alpha
+end-alter-parameters
+
+
+end-operator-section
+
+INTEGRATOR-SECTION
+SIL/all
+end-integrator-section
+
+INIT_WF-SECTION
+build 
+#initialises wavepacket on upper electronic state
+init_state=2
+-----------------------------------------------------------  
+# mode    type     center  moment.  width  pop(default=1)
+-----------------------------------------------------------  
+    x      gauss  -1.80     x_moment      0.5
+    y      gauss   0.00     0.0      0.5                 
+-----------------------------------------------------------  
+end-build
+end-init_wf-section
+
+end-input
