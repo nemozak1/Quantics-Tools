@@ -5,10 +5,12 @@ cd $PBS_O_WORKDIR
 
 module load intel-suite
 
-#script takes a given tilt, runs a propogation, gets adiabatic populations, width and position expectation values of the diabatic and adi
+#script takes a given tilt, runs a propogation, gets adiabatic populations, width position, momentum, kinetic energy expectation values of the diabatic and adiabatic staes
 
+#Title for folder containing experiments
 experiment_name=tilt_angles2
-#Create directory to store the data, transfer some required files
+
+#Create directory to store the data, transfer some required files, this is run automatically once if used with "bulk-submitter-advanced-py"
 #mkdir $experiment_name
 #cp tilt_input.inp $experiment_name/tilt_input.inp
 #cp dirname_changer.py $experiment_name/dirname_changer.py
@@ -89,8 +91,4 @@ expect -w -o ./expectations_dir/KE_xdiabstate2-a$alpha xKEstate2
 expect -w -o ./expectations_dir/KE_ydiabstate1-a$alpha yKEstate1
 expect -w -o ./expectations_dir/KE_ydiabstate2-a$alpha yKEstate2
 
-#sends all relevant data files to onedrive
-rclone copy adp-a$alpha imp:$ONEDRIVE_DIR/$experiment_name/$dirname
-rclone copy etot.pl imp:$ONEDRIVE_DIR/$experiment_name/$dirname
-rclone copy ./expectations_dir/ imp:$ONEDRIVE_DIR/$experiment_name/$dirname/expectations_dir
 
